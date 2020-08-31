@@ -37,7 +37,9 @@ func TestCRD(t *testing.T) {
 					"user": "msaleem",
 				},
 			},
-			Spec: zv1.TestSpec{},
+			Spec: zv1.TestSpec{
+				Replicas: nil,
+			},
 		},
 		metav1.CreateOptions{},
 	)
