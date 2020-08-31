@@ -398,7 +398,8 @@ type TestSpec struct {
 	// Number of desired pods. This is a pointer to distinguish between explicit
 	// zero and not specified. Defaults to 1.
 	// +optional
-	Replicas *int32 `json:"replicas,omitempty"`
+	//	Replicas *int32 `json:"replicas",omitempty`
+	Replicas *int32 `json:"replicas"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
