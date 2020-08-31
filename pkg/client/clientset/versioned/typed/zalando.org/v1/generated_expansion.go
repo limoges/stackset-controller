@@ -21,3 +21,5 @@ package v1
 type StackExpansion interface{}
 
 type StackSetExpansion interface{}
+
+type TestExpansion interface{}

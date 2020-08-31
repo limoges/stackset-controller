@@ -33,3 +33,11 @@ type StackSetListerExpansion interface{}
 // StackSetNamespaceListerExpansion allows custom methods to be added to
 // StackSetNamespaceLister.
 type StackSetNamespaceListerExpansion interface{}
+
+// TestListerExpansion allows custom methods to be added to
+// TestLister.
+type TestListerExpansion interface{}
+
+// TestNamespaceListerExpansion allows custom methods to be added to
+// TestNamespaceLister.
+type TestNamespaceListerExpansion interface{}

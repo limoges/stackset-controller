@@ -57,6 +57,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Zalando().V1().Stacks().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("stacksets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Zalando().V1().StackSets().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("tests"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Zalando().V1().Tests().Informer()}, nil
 
 	}
 

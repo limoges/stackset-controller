@@ -28,6 +28,7 @@ type ZalandoV1Interface interface {
 	RESTClient() rest.Interface
 	StacksGetter
 	StackSetsGetter
+	TestsGetter
 }
 
 // ZalandoV1Client is used to interact with features provided by the zalando.org group.
@@ -41,6 +42,10 @@ func (c *ZalandoV1Client) Stacks(namespace string) StackInterface {
 
 func (c *ZalandoV1Client) StackSets(namespace string) StackSetInterface {
 	return newStackSets(c, namespace)
+}
+
+func (c *ZalandoV1Client) Tests(namespace string) TestInterface {
+	return newTests(c, namespace)
 }
 
 // NewForConfig creates a new ZalandoV1Client for the given config.

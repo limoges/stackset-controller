@@ -36,6 +36,10 @@ func (c *FakeZalandoV1) StackSets(namespace string) v1.StackSetInterface {
 	return &FakeStackSets{c, namespace}
 }
 
+func (c *FakeZalandoV1) Tests(namespace string) v1.TestInterface {
+	return &FakeTests{c, namespace}
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeZalandoV1) RESTClient() rest.Interface {

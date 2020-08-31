@@ -400,3 +400,14 @@ type TestSpec struct {
 	// +optional
 	Replicas *int32 `json:"replicas,omitempty"`
 }
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// TestList is a list of Stacks.
+// +k8s:deepcopy-gen=true
+type TestList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+
+	Items []Test `json:"items"`
+}

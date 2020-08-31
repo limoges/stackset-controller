@@ -28,6 +28,8 @@ type Interface interface {
 	Stacks() StackInformer
 	// StackSets returns a StackSetInformer.
 	StackSets() StackSetInformer
+	// Tests returns a TestInformer.
+	Tests() TestInformer
 }
 
 type version struct {
@@ -49,4 +51,9 @@ func (v *version) Stacks() StackInformer {
 // StackSets returns a StackSetInformer.
 func (v *version) StackSets() StackSetInformer {
 	return &stackSetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// Tests returns a TestInformer.
+func (v *version) Tests() TestInformer {
+	return &testInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
