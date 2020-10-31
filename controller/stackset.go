@@ -54,7 +54,7 @@ type StackSetController struct {
 	client                      clientset.Interface
 	controllerID                string
 	backendWeightsAnnotationKey string
-	clusterDomain               string
+	clusterDomains              []string
 	interval                    time.Duration
 	stacksetEvents              chan stacksetEvent
 	stacksetStore               map[types.UID]zv1.StackSet
@@ -81,7 +81,7 @@ func (ee *eventedError) Error() string {
 }
 
 // NewStackSetController initializes a new StackSetController.
-func NewStackSetController(client clientset.Interface, controllerID, backendWeightsAnnotationKey, clusterDomain string, registry prometheus.Registerer, interval time.Duration, routeGroupSupportEnabled bool, ingressSourceSwitchTTL time.Duration) (*StackSetController, error) {
+func NewStackSetController(client clientset.Interface, controllerID, backendWeightsAnnotationKey string, clusterDomains []string, registry prometheus.Registerer, interval time.Duration, routeGroupSupportEnabled bool, ingressSourceSwitchTTL time.Duration) (*StackSetController, error) {
 	metricsReporter, err := core.NewMetricsReporter(registry)
 	if err != nil {
 		return nil, err
@@ -92,7 +92,7 @@ func NewStackSetController(client clientset.Interface, controllerID, backendWeig
 		client:                      client,
 		controllerID:                controllerID,
 		backendWeightsAnnotationKey: backendWeightsAnnotationKey,
-		clusterDomain:               clusterDomain,
+		clusterDomains:              clusterDomains,
 		interval:                    interval,
 		stacksetEvents:              make(chan stacksetEvent, 1),
 		stacksetStore:               make(map[types.UID]zv1.StackSet),
@@ -225,7 +225,7 @@ func (c *StackSetController) collectResources(ctx context.Context) (map[types.UI
 			}
 		}
 
-		stacksetContainer := core.NewContainer(&stackset, reconciler, c.backendWeightsAnnotationKey, c.clusterDomain)
+		stacksetContainer := core.NewContainer(&stackset, reconciler, c.backendWeightsAnnotationKey, c.clusterDomains)
 		stacksets[uid] = stacksetContainer
 	}
 

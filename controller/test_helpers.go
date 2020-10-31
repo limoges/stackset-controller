@@ -50,7 +50,7 @@ func NewTestEnvironment() *testEnvironment {
 		rgClient:  rgfake.NewSimpleClientset(),
 	}
 
-	controller, err := NewStackSetController(client, "", "", "", prometheus.NewPedanticRegistry(), time.Minute, true, time.Minute)
+	controller, err := NewStackSetController(client, "", "", nil, prometheus.NewPedanticRegistry(), time.Minute, true, time.Minute)
 	if err != nil {
 		panic(err)
 	}
