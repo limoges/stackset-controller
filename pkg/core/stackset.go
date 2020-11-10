@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"sort"
+	"time"
 
 	rgv1 "github.com/szuecs/routegroup-client/apis/zalando.org/v1"
 	zv1 "github.com/zalando-incubator/stackset-controller/pkg/apis/zalando.org/v1"
@@ -16,7 +17,8 @@ const (
 	StacksetHeritageLabelKey = "stackset"
 	StackVersionLabelKey     = "stack-version"
 
-	ingressTrafficAuthoritativeAnnotation = "zalando.org/traffic-authoritative"
+	ingressTrafficAuthoritativeAnnotation          = "zalando.org/traffic-authoritative"
+	StacksetControllerUpdateTimestampAnnotationkey = "stackset-controller.zalando.org/updated-timestamp"
 )
 
 var (
@@ -135,6 +137,7 @@ func (ssc *StackSetContainer) MarkExpiredStacks() {
 	}
 }
 
+// TODO: Add annoation for LastUpdatedTimstamp
 func (ssc *StackSetContainer) GenerateRouteGroup() (*rgv1.RouteGroup, error) {
 	stackset := ssc.StackSet
 	if stackset.Spec.RouteGroup == nil {
@@ -158,6 +161,9 @@ func (ssc *StackSetContainer) GenerateRouteGroup() (*rgv1.RouteGroup, error) {
 					Name:       stackset.Name,
 					UID:        stackset.UID,
 				},
+			},
+			Annotations: map[string]string{
+				StacksetControllerUpdateTimestampAnnotationkey: time.Now().String(),
 			},
 		},
 		Spec: rgv1.RouteGroupSpec{
