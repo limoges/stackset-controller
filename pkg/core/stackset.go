@@ -214,6 +214,7 @@ func (ssc *StackSetContainer) GenerateRouteGroup() (*rgv1.RouteGroup, error) {
 	return result, nil
 }
 
+// Add UpdatedTimestamp annotation
 func (ssc *StackSetContainer) GenerateIngress() (*networking.Ingress, error) {
 	stackset := ssc.StackSet
 	if stackset.Spec.Ingress == nil {

@@ -615,8 +615,9 @@ func TestReconcileStackSetIngress(t *testing.T) {
 			},
 			routegroup: &rgv1.RouteGroup{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:              testStackSet.Name,
-					CreationTimestamp: metav1.NewTime(time.Now().UTC()),
+					Name: testStackSet.Name,
+					// TODO: Use the config IngressSourceSwitchTTL instead of the magic 6
+					CreationTimestamp: metav1.NewTime(time.Now().UTC().Add(time.Minute * -6)),
 				},
 			},
 			updated: nil,
