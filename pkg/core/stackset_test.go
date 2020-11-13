@@ -1100,6 +1100,9 @@ func TestStackSetGenerateRouteGroup(t *testing.T) {
 					UID:        "abc-123",
 				},
 			},
+			Annotations: map[string]string{
+				StacksetControllerUpdateTimestampAnnotationkey: time.Now().String(),
+			},
 		},
 		Spec: rgv1.RouteGroupSpec{
 			Hosts: []string{"example.org", "example.com"},
@@ -1162,5 +1165,22 @@ func TestStackSetGenerateRouteGroup(t *testing.T) {
 			},
 		},
 	}
-	require.Equal(t, expected, routegroup)
+	require.Equal(t, expected.Name, routegroup.Name)
+	require.Equal(t, expected.Namespace, routegroup.Namespace)
+	require.Equal(t, expected.Labels, routegroup.Labels)
+	// Annotation values contain timestamps so only checking the keys
+	for _, k := range keys(expected.Annotations) {
+		require.Contains(t, routegroup.Annotations, k)
+	}
+	require.Equal(t, expected.Spec, routegroup.Spec)
+
+}
+
+func keys(kv map[string]string) []string {
+	ks := make([]string, 0, len(kv))
+	for k := range kv {
+		ks = append(ks, k)
+	}
+
+	return ks
 }
