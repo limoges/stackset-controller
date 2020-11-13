@@ -648,7 +648,6 @@ func TestReconcileStackSetIngress(t *testing.T) {
 			},
 		},
 		{
-			// TODO: take into account RouteGroup UpdatedTimestamp
 			name: "ingress is removed if RouteGroup is old enough",
 			existing: &networking.Ingress{
 				ObjectMeta: stacksetOwned(testStackSet),
@@ -663,6 +662,9 @@ func TestReconcileStackSetIngress(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name:              testStackSet.Name,
 					CreationTimestamp: metav1.NewTime(time.Now().UTC().Add(-2 * time.Minute)),
+					Annotations: map[string]string{
+						core.StacksetControllerUpdateTimestampAnnotationkey: time.Now().UTC().Add(-2 * time.Minute).Format(time.RFC3339),
+					},
 				},
 			},
 			updated:  nil,

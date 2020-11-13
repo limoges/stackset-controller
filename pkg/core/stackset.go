@@ -137,7 +137,6 @@ func (ssc *StackSetContainer) MarkExpiredStacks() {
 	}
 }
 
-// TODO: Add annoation for LastUpdatedTimstamp
 func (ssc *StackSetContainer) GenerateRouteGroup() (*rgv1.RouteGroup, error) {
 	stackset := ssc.StackSet
 	if stackset.Spec.RouteGroup == nil {
@@ -163,7 +162,8 @@ func (ssc *StackSetContainer) GenerateRouteGroup() (*rgv1.RouteGroup, error) {
 				},
 			},
 			Annotations: map[string]string{
-				StacksetControllerUpdateTimestampAnnotationkey: time.Now().String(),
+				// using the same time.Format as the metav1.Time
+				StacksetControllerUpdateTimestampAnnotationkey: time.Now().Format(time.RFC3339),
 			},
 		},
 		Spec: rgv1.RouteGroupSpec{

@@ -1165,6 +1165,7 @@ func TestStackSetGenerateRouteGroup(t *testing.T) {
 			},
 		},
 	}
+
 	require.Equal(t, expected.Name, routegroup.Name)
 	require.Equal(t, expected.Namespace, routegroup.Namespace)
 	require.Equal(t, expected.Labels, routegroup.Labels)

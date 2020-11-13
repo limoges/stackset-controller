@@ -665,8 +665,8 @@ func (c *StackSetController) ReconcileStackSetIngress(ctx context.Context, stack
 				if routegroup == nil {
 					c.logger.Infof("Not deleting Ingress %s yet, RouteGroup missing", existing.Name)
 					return nil
-				} else if !routegroup.CreationTimestamp.Time.IsZero() && time.Since(routegroup.CreationTimestamp.Time) < c.ingressSourceSwitchTTL {
-					c.logger.Infof("Not deleting Ingress %s yet, RouteGroup %s created less than %s ago (%s)", existing.Name, routegroup.Name, c.ingressSourceSwitchTTL, time.Since(routegroup.CreationTimestamp.Time))
+				} else if !routeGroupReady(routegroup, c.ingressSourceSwitchTTL) {
+					c.logger.Infof("Not deleting Ingress %s yet, RouteGroup %s created less than %s ago", existing.Name, routegroup.Name, c.ingressSourceSwitchTTL)
 					return nil
 				}
 			}
@@ -722,6 +722,7 @@ func (c *StackSetController) ReconcileStackSetIngress(ctx context.Context, stack
 	return nil
 }
 
+// TODO: update to only check Ingress UpdateTimestamp
 func (c *StackSetController) ReconcileStackSetRouteGroup(ctx context.Context, stackset *zv1.StackSet, existing *rgv1.RouteGroup, ingress *networking.Ingress, generateUpdated func() (*rgv1.RouteGroup, error)) error {
 	rg, err := generateUpdated()
 	if err != nil {
@@ -972,4 +973,30 @@ func fixupStackTypeMeta(stack *zv1.Stack) {
 	// https://github.com/kubernetes/client-go/issues/308
 	stack.APIVersion = core.APIVersion
 	stack.Kind = core.KindStack
+}
+
+func routeGroupReady(rg *rgv1.RouteGroup, ttl time.Duration) bool {
+	var rgLastUpdated time.Time
+	timestamp, ok := rg.Annotations[core.StacksetControllerUpdateTimestampAnnotationkey]
+	// The only scenario version we could think of for this is
+	//  if the RouteGroup was created by an older version of StackSet Controller
+	//  in that case, just wait until the RouteGroup has the annotation
+	// TODO: mayb add an e2e for this to verify
+	if !ok {
+		// TODO: Log this
+		return false
+	}
+
+	rgLastUpdated, err := time.Parse(time.RFC3339, timestamp)
+	if err != nil {
+		// wait until there's a valid timestamp on the annotation
+		// TODO: Log this
+		return false
+	}
+
+	if !rgLastUpdated.IsZero() && time.Since(rgLastUpdated) > ttl {
+		return true
+	}
+
+	return false
 }
