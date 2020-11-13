@@ -1021,7 +1021,16 @@ func TestStackSetGenerateIngress(t *testing.T) {
 			},
 		},
 	}
-	require.Equal(t, expected, ingress)
+	require.Equal(t, expected.Name, ingress.Name)
+	require.Equal(t, expected.Namespace, ingress.Namespace)
+	require.Equal(t, expected.Labels, ingress.Labels)
+	// TODO: Create a clock instance and mock it here. Here it becomes
+	//  even more critical, as the annotations are important.
+	// Annotation values contain timestamps so only checking the keys
+	for _, k := range keys(expected.Annotations) {
+		require.Contains(t, ingress.Annotations, k)
+	}
+	require.Equal(t, expected.Spec, ingress.Spec)
 }
 
 func TestStackSetGenerateIngressNone(t *testing.T) {
@@ -1170,6 +1179,7 @@ func TestStackSetGenerateRouteGroup(t *testing.T) {
 	require.Equal(t, expected.Name, routegroup.Name)
 	require.Equal(t, expected.Namespace, routegroup.Namespace)
 	require.Equal(t, expected.Labels, routegroup.Labels)
+	// TODO: Create a clock instance and mock it here
 	// Annotation values contain timestamps so only checking the keys
 	for _, k := range keys(expected.Annotations) {
 		require.Contains(t, routegroup.Annotations, k)

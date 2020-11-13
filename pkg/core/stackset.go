@@ -214,7 +214,6 @@ func (ssc *StackSetContainer) GenerateRouteGroup() (*rgv1.RouteGroup, error) {
 	return result, nil
 }
 
-// Add UpdatedTimestamp annotation
 func (ssc *StackSetContainer) GenerateIngress() (*networking.Ingress, error) {
 	stackset := ssc.StackSet
 	if stackset.Spec.Ingress == nil {
@@ -226,8 +225,13 @@ func (ssc *StackSetContainer) GenerateIngress() (*networking.Ingress, error) {
 		stackset.Labels,
 	)
 
-	trafficAuthoritative := map[string]string{
+	annotations := map[string]string{
 		ingressTrafficAuthoritativeAnnotation: "false",
+		// TODO: maybe create one instance of a "timer" to hold the
+		//  logic on how to get the current timestamp. It's already
+		//  used in two places and can't be easily tested.
+		// using the same time.Format as the metav1.Time
+		StacksetControllerUpdateTimestampAnnotationkey: time.Now().Format(time.RFC3339),
 	}
 
 	result := &networking.Ingress{
@@ -235,7 +239,7 @@ func (ssc *StackSetContainer) GenerateIngress() (*networking.Ingress, error) {
 			Name:        stackset.Name,
 			Namespace:   stackset.Namespace,
 			Labels:      labels,
-			Annotations: mergeLabels(stackset.Spec.Ingress.Annotations, trafficAuthoritative),
+			Annotations: mergeLabels(stackset.Spec.Ingress.Annotations, annotations),
 			OwnerReferences: []metav1.OwnerReference{
 				{
 					APIVersion: stackset.APIVersion,

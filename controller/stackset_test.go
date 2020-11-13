@@ -871,8 +871,53 @@ func TestReconcileStackSetRouteGroup(t *testing.T) {
 			},
 			ingress: &networking.Ingress{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:              testStackSet.Name,
-					CreationTimestamp: metav1.NewTime(time.Now().UTC()),
+					Name: testStackSet.Name,
+					Annotations: map[string]string{
+						core.StacksetControllerUpdateTimestampAnnotationkey: time.Now().Format(time.RFC3339),
+					},
+				},
+			},
+			updated: nil,
+			expected: &rgv1.RouteGroup{
+				ObjectMeta: stacksetOwned(testStackSet),
+				Spec:       exampleSpec,
+			},
+		},
+		{
+			name: "routegroup is not removed if Ingress does not have the updatedTimestamp",
+			existing: &rgv1.RouteGroup{
+				ObjectMeta: stacksetOwned(testStackSet),
+				Spec:       exampleSpec,
+			},
+			ingressSpec: &zv1.StackSetIngressSpec{
+				Hosts: []string{"example.org"},
+			},
+			ingress: &networking.Ingress{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: testStackSet.Name,
+				},
+			},
+			updated: nil,
+			expected: &rgv1.RouteGroup{
+				ObjectMeta: stacksetOwned(testStackSet),
+				Spec:       exampleSpec,
+			},
+		},
+		{
+			name: "routegroup is not removed if Ingress has an invalid updatedTimestamp",
+			existing: &rgv1.RouteGroup{
+				ObjectMeta: stacksetOwned(testStackSet),
+				Spec:       exampleSpec,
+			},
+			ingressSpec: &zv1.StackSetIngressSpec{
+				Hosts: []string{"example.org"},
+			},
+			ingress: &networking.Ingress{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: testStackSet.Name,
+					Annotations: map[string]string{
+						core.StacksetControllerUpdateTimestampAnnotationkey: "ANotValidTimeStamp",
+					},
 				},
 			},
 			updated: nil,
@@ -908,8 +953,11 @@ func TestReconcileStackSetRouteGroup(t *testing.T) {
 			},
 			ingress: &networking.Ingress{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:              testStackSet.Name,
-					CreationTimestamp: metav1.NewTime(time.Now().UTC().Add(-2 * time.Minute)),
+					Name: testStackSet.Name,
+					// TODO: Stop using this magic number (-2)
+					Annotations: map[string]string{
+						core.StacksetControllerUpdateTimestampAnnotationkey: time.Now().UTC().Add(-2 * time.Minute).Format(time.RFC3339),
+					},
 				},
 			},
 			updated:  nil,
