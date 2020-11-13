@@ -616,8 +616,60 @@ func TestReconcileStackSetIngress(t *testing.T) {
 			routegroup: &rgv1.RouteGroup{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: testStackSet.Name,
-					// TODO: Use the config IngressSourceSwitchTTL instead of the magic 6
-					CreationTimestamp: metav1.NewTime(time.Now().UTC().Add(time.Minute * -6)),
+					Annotations: map[string]string{
+						core.StacksetControllerUpdateTimestampAnnotationkey: time.Now().Format(time.RFC3339),
+					},
+				},
+			},
+			updated: nil,
+			expected: &networking.Ingress{
+				ObjectMeta: stacksetOwned(testStackSet),
+				Spec: networking.IngressSpec{
+					Rules: exampleRules,
+				},
+			},
+		},
+		{
+			name: "ingress is not removed if RouteGroup does not have the updatedTimestamp",
+			existing: &networking.Ingress{
+				ObjectMeta: stacksetOwned(testStackSet),
+				Spec: networking.IngressSpec{
+					Rules: exampleRules,
+				},
+			},
+			routegroupSpec: &zv1.RouteGroupSpec{
+				Hosts: []string{"example.org"},
+			},
+			routegroup: &rgv1.RouteGroup{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: testStackSet.Name,
+				},
+			},
+			updated: nil,
+			expected: &networking.Ingress{
+				ObjectMeta: stacksetOwned(testStackSet),
+				Spec: networking.IngressSpec{
+					Rules: exampleRules,
+				},
+			},
+		},
+		{
+			name: "ingress is not removed if RouteGroup has an invalid updatedTimestamp",
+			existing: &networking.Ingress{
+				ObjectMeta: stacksetOwned(testStackSet),
+				Spec: networking.IngressSpec{
+					Rules: exampleRules,
+				},
+			},
+			routegroupSpec: &zv1.RouteGroupSpec{
+				Hosts: []string{"example.org"},
+			},
+			routegroup: &rgv1.RouteGroup{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: testStackSet.Name,
+					Annotations: map[string]string{
+						core.StacksetControllerUpdateTimestampAnnotationkey: "ANotValidTimeStamp",
+					},
 				},
 			},
 			updated: nil,
@@ -660,8 +712,8 @@ func TestReconcileStackSetIngress(t *testing.T) {
 			},
 			routegroup: &rgv1.RouteGroup{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:              testStackSet.Name,
-					CreationTimestamp: metav1.NewTime(time.Now().UTC().Add(-2 * time.Minute)),
+					Name: testStackSet.Name,
+					// TODO: Stop using this magic number (-2)
 					Annotations: map[string]string{
 						core.StacksetControllerUpdateTimestampAnnotationkey: time.Now().UTC().Add(-2 * time.Minute).Format(time.RFC3339),
 					},

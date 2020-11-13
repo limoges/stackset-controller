@@ -932,9 +932,10 @@ func TestStackSetGenerateIngress(t *testing.T) {
 	require.NoError(t, err)
 
 	annotations := map[string]string{
-		"ingress":                           "annotation",
-		"zalando.org/backend-weights":       `{"foo-v1":0.25,"foo-v2":0.125,"foo-v3":0.625}`,
-		"zalando.org/traffic-authoritative": "false",
+		"ingress":                                      "annotation",
+		"zalando.org/backend-weights":                  `{"foo-v1":0.25,"foo-v2":0.125,"foo-v3":0.625}`,
+		"zalando.org/traffic-authoritative":            "false",
+		StacksetControllerUpdateTimestampAnnotationkey: time.Now().String(),
 	}
 
 	expected := &networking.Ingress{

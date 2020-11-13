@@ -917,7 +917,7 @@ func (c *StackSetController) ReconcileStackSet(ctx context.Context, container *c
 		}
 	}
 
-	// Reconcile stackset resources (generates ingress with annotations). Proceed on errors.
+	// Reconcile stackset resources (update ingress and/or routegroups). Proceed on errors.
 	err = c.ReconcileStackSetResources(ctx, container)
 	if err != nil {
 		err = c.errorEventf(container.StackSet, reasonFailedManageStackSet, err)
