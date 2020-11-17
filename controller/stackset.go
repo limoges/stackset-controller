@@ -1001,26 +1001,26 @@ func routeGroupReady(rg *rgv1.RouteGroup, ttl time.Duration) bool {
 	return false
 }
 
-func ingressReady(rg *rgv1.RouteGroup, ttl time.Duration) bool {
-	var rgLastUpdated time.Time
-	timestamp, ok := rg.Annotations[core.StacksetControllerUpdateTimestampAnnotationkey]
+func ingressReady(ing *networking.Ingress, ttl time.Duration) bool {
+	var ingLastUpdated time.Time
+	timestamp, ok := ing.Annotations[core.StacksetControllerUpdateTimestampAnnotationkey]
 	// The only scenario version we could think of for this is
-	//  if the RouteGroup was created by an older version of StackSet Controller
-	//  in that case, just wait until the RouteGroup has the annotation
-	// TODO: mayb add an e2e for this to verify
+	//  if the Ingress was created by an older version of StackSet Controller
+	//  in that case, just wait until the Ingress has the annotation
+	// TODO: maybe add an e2e for this to verify
 	if !ok {
 		// TODO: Log this
 		return false
 	}
 
-	rgLastUpdated, err := time.Parse(time.RFC3339, timestamp)
+	ingLastUpdated, err := time.Parse(time.RFC3339, timestamp)
 	if err != nil {
 		// wait until there's a valid timestamp on the annotation
 		// TODO: Log this
 		return false
 	}
 
-	if !rgLastUpdated.IsZero() && time.Since(rgLastUpdated) > ttl {
+	if !ingLastUpdated.IsZero() && time.Since(ingLastUpdated) > ttl {
 		return true
 	}
 
